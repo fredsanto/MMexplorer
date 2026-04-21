@@ -4,14 +4,16 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 jobs:
-  build-and-release:
+
+  # ── Windows installer ──────────────────────────────────────────────────────
+  build-windows:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -22,65 +24,119 @@ jobs:
           activate-environment: buildenv
           auto-activate-base: false
 
-      - name: Install conda dependencies
+      - name: Install dependencies
         shell: bash -el {0}
         run: |
           conda install -y -c conda-forge openmm pdbfixer numpy
-
-      - name: Install pip dependencies
-        shell: bash -el {0}
-        run: |
           pip install pyinstaller flask biopython requests werkzeug jinja2
 
       - name: Build with PyInstaller
         shell: bash -el {0}
-        run: |
-          pyinstaller protein_mutation.spec --log-level WARN
-
-      - name: Download VC++ redistributable
-        shell: bash -el {0}
-        run: |
-          curl -L "https://aka.ms/vs/17/release/vc_redist.x64.exe" \
-            -o installer/vc_redist.x64.exe
+        run: pyinstaller protein_mutation.spec --log-level WARN
 
       - name: Install Inno Setup
         run: choco install innosetup -y
 
-      - name: Create output directory
-        run: mkdir -p installer\output
+      - name: Build installer
+        run: '& "C:\Program Files (x86)\Inno Setup 6\Compil32.exe" installer\installer.iss'
 
-      - name: Build installer with Inno Setup
+      - name: Rename installer to tag version
         run: |
-          & "C:\Program Files (x86)\Inno Setup 6\Compil32.exe" installer\setup.iss
-
-      - name: Confirm installer exists
-        run: |
-          dir installer\output\
-          if (!(Test-Path "installer\output\ProteinMutationExplorer-1.0.0-Setup.exe")) {
-            Write-Error "Installer not found"
-            exit 1
-          }
-
-      - name: Rename installer to include tag version
-        run: |
-          $tag = "${{ github.ref_name }}"
-          $version = $tag.TrimStart("v")
+          $version = "${{ github.ref_name }}".TrimStart("v")
           Rename-Item `
             "installer\output\ProteinMutationExplorer-1.0.0-Setup.exe" `
             "installer\output\ProteinMutationExplorer-$version-Setup.exe" `
             -ErrorAction SilentlyContinue
 
-      - name: Upload installer to release
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: installer/output/ProteinMutationExplorer-*-Setup.exe
+
+  # ── macOS DMG ──────────────────────────────────────────────────────────────
+  build-mac:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up conda (miniforge)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: mmexplorer
+          python-version: "3.11"
+          channels: conda-forge,defaults
+          channel-priority: strict
+
+      - name: Install dependencies
+        shell: bash -el {0}
+        run: |
+          conda install -y openmm pdbfixer
+          pip install flask biopython requests numpy pyinstaller
+
+      - name: Build .app with PyInstaller
+        shell: bash -el {0}
+        run: pyinstaller protein_mutation_mac.spec --noconfirm
+
+      - name: Ad-hoc code sign
+        run: codesign --force --deep --sign - "dist/ProteinMutationExplorer.app"
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Build DMG
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          create-dmg \
+            --volname "Protein Mutation Explorer" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 128 \
+            --icon "ProteinMutationExplorer.app" 150 185 \
+            --hide-extension "ProteinMutationExplorer.app" \
+            --app-drop-link 450 185 \
+            "dist/ProteinMutationExplorer-${VERSION}-mac.dmg" \
+            "dist/ProteinMutationExplorer.app" \
+          || hdiutil create \
+              -volname "Protein Mutation Explorer" \
+              -srcfolder "dist/ProteinMutationExplorer.app" \
+              -ov -format UDZO \
+              "dist/ProteinMutationExplorer-${VERSION}-mac.dmg"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dmg
+          path: dist/ProteinMutationExplorer-*-mac.dmg
+
+  # ── GitHub Release (waits for both builds) ────────────────────────────────
+  release:
+    needs: [build-windows, build-mac]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           name: "Protein Mutation Explorer ${{ github.ref_name }}"
           body: |
             ## Protein Mutation Explorer ${{ github.ref_name }}
-            Download and run the installer below.
-            Requires Windows 10 or later (64-bit).
-          files: installer/output/ProteinMutationExplorer-*-Setup.exe
-          fail_on_unmatched_files: true
-          draft: false
-          prerelease: false
+
+            | Platform | Download |
+            |----------|----------|
+            | Windows  | `ProteinMutationExplorer-*-Setup.exe` |
+            | macOS    | `ProteinMutationExplorer-*-mac.dmg`  |
+          files: |
+            artifacts/windows-installer/*
+            artifacts/mac-dmg/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
