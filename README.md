@@ -40,6 +40,7 @@ pip install flask biopython requests numpy
 ```bash
 python app.py
 # Opens http://localhost:5050
+or just run the binary releases for Windows and Mac
 ```
 
 ---
