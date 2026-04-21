@@ -41,19 +41,16 @@ rm -f "dist/${DMG_NAME}.dmg"
 
 create-dmg \
     --volname "$VOLUME_NAME" \
-    --volicon "installer/icon.icns" \
     --window-pos 200 120 \
     --window-size 600 400 \
     --icon-size 128 \
     --icon "$APP_BUNDLE" 150 185 \
     --hide-extension "$APP_BUNDLE" \
     --app-drop-link 450 185 \
-    --background "installer/dmg_background.png" \
     "dist/${DMG_NAME}.dmg" \
     "dist/$APP_BUNDLE" \
 || {
     # Fallback: plain DMG without background/positioning if assets missing
-    echo "  Falling back to plain DMG (add installer/icon.icns and installer/dmg_background.png for styled DMG)..."
     hdiutil create \
         -volname "$VOLUME_NAME" \
         -srcfolder "dist/$APP_BUNDLE" \

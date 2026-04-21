@@ -60,7 +60,7 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,           # no black console window
-    icon="installer\\icon.ico",
+    icon=None,
 )
 
 coll = COLLECT(

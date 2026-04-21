@@ -21,7 +21,6 @@ AllowNoIcons=yes
 LicenseFile=license.txt
 OutputDir=output
 OutputBaseFilename=MMexplorer-{#AppVersion}-Setup
-SetupIconFile=icon.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern

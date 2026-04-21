@@ -61,7 +61,7 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name="MMexplorer.app",
-    icon="installer/icon.icns",
+    icon=None,
     bundle_identifier="com.fredsanto.mmexplorer",
     info_plist={
         "CFBundleName":               "MMexplorer",
