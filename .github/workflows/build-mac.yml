@@ -1,0 +1,73 @@
+name: Build macOS DMG
+
+on:
+  push:
+    tags:
+      - "v*"          # trigger on version tags: v1.0.0, v1.2.3, …
+  workflow_dispatch:  # also runnable manually from the Actions tab
+
+jobs:
+  build-dmg:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up conda (miniforge)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: mmexplorer
+          python-version: "3.11"
+          channels: conda-forge,defaults
+          channel-priority: strict
+
+      - name: Install dependencies
+        shell: bash -el {0}
+        run: |
+          conda install -y openmm pdbfixer
+          pip install flask biopython requests numpy pyinstaller
+
+      - name: Build .app with PyInstaller
+        shell: bash -el {0}
+        run: |
+          pyinstaller protein_mutation_mac.spec --noconfirm
+
+      - name: Ad-hoc code sign
+        run: codesign --force --deep --sign - "dist/ProteinMutationExplorer.app"
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Build DMG
+        run: |
+          create-dmg \
+            --volname "Protein Mutation Explorer" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 128 \
+            --icon "ProteinMutationExplorer.app" 150 185 \
+            --hide-extension "ProteinMutationExplorer.app" \
+            --app-drop-link 450 185 \
+            "dist/ProteinMutationExplorer-mac.dmg" \
+            "dist/ProteinMutationExplorer.app" \
+          || hdiutil create \
+              -volname "Protein Mutation Explorer" \
+              -srcfolder "dist/ProteinMutationExplorer.app" \
+              -ov -format UDZO \
+              "dist/ProteinMutationExplorer-mac.dmg"
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProteinMutationExplorer-mac
+          path: dist/ProteinMutationExplorer-mac.dmg
+          retention-days: 30
+
+      # Attach to GitHub Release when triggered by a tag
+      - name: Upload to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ProteinMutationExplorer-mac.dmg
