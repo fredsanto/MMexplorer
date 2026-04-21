@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+build/
+dist/
+venv_win/
+venv/
+.venv/
+sessions/
+installer/output/
+*.egg-info/
+.DS_Store
