@@ -1,4 +1,4 @@
-# MMexplorer — MMexplorer
+# MMexplorer
 
 **Fetch a protein structure, apply a missense mutation, energy-minimise with OpenMM, and compare original vs mutant side-by-side in the browser.**
 
