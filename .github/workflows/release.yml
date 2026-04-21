@@ -51,7 +51,7 @@ jobs:
 
       - name: Build installer with Inno Setup
         run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\setup.iss
+          & "C:\Program Files (x86)\Inno Setup 6\Compil32.exe" installer\setup.iss
 
       - name: Confirm installer exists
         run: |
