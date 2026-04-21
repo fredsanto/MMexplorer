@@ -5,9 +5,9 @@
 
 set -euo pipefail
 
-APP_NAME="Protein Mutation Explorer"
-APP_BUNDLE="ProteinMutationExplorer.app"
-DMG_NAME="ProteinMutationExplorer-1.0.0-mac"
+APP_NAME="MMexplorer"
+APP_BUNDLE="MMexplorer.app"
+DMG_NAME="MMexplorer-1.0.0-mac"
 VOLUME_NAME="$APP_NAME"
 
 echo "============================================================"
@@ -20,7 +20,7 @@ echo "[1/3] Installing PyInstaller if needed..."
 pip show pyinstaller &>/dev/null || pip install pyinstaller
 
 echo "[1/3] Bundling app with PyInstaller..."
-rm -rf "dist/$APP_BUNDLE" build/ProteinMutationExplorer
+rm -rf "dist/$APP_BUNDLE" build/MMexplorer
 pyinstaller protein_mutation_mac.spec --noconfirm
 
 # ---- 2. Ad-hoc code sign (allows Gatekeeper to run without a paid cert) ----

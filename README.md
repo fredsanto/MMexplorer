@@ -1,4 +1,4 @@
-# MMexplorer — Missense Mutation Explorer
+# MMexplorer — MMexplorer
 
 **Fetch a protein structure, apply a missense mutation, energy-minimise with OpenMM, and compare original vs mutant side-by-side in the browser.**
 
@@ -65,7 +65,7 @@ pip install pyinstaller
 build_windows.bat
 ```
 
-Requires [Inno Setup 6](https://jrsoftware.org/isdl.php). Output: `installer\output\ProteinMutationExplorer-1.0.0-Setup.exe`
+Requires [Inno Setup 6](https://jrsoftware.org/isdl.php). Output: `installer\output\MMexplorer-1.0.0-Setup.exe`
 
 ---
 

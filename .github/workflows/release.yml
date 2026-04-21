@@ -44,15 +44,15 @@ jobs:
         run: |
           $version = "${{ github.ref_name }}".TrimStart("v")
           Rename-Item `
-            "installer\output\ProteinMutationExplorer-1.0.0-Setup.exe" `
-            "installer\output\ProteinMutationExplorer-$version-Setup.exe" `
+            "installer\output\MMexplorer-1.0.0-Setup.exe" `
+            "installer\output\MMexplorer-$version-Setup.exe" `
             -ErrorAction SilentlyContinue
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: installer/output/ProteinMutationExplorer-*-Setup.exe
+          path: installer/output/MMexplorer-*-Setup.exe
 
   # ── macOS DMG ──────────────────────────────────────────────────────────────
   build-mac:
@@ -81,7 +81,7 @@ jobs:
         run: pyinstaller protein_mutation_mac.spec --noconfirm
 
       - name: Ad-hoc code sign
-        run: codesign --force --deep --sign - "dist/ProteinMutationExplorer.app"
+        run: codesign --force --deep --sign - "dist/MMexplorer.app"
 
       - name: Install create-dmg
         run: brew install create-dmg
@@ -91,26 +91,26 @@ jobs:
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
           create-dmg \
-            --volname "Protein Mutation Explorer" \
+            --volname "MMexplorer" \
             --window-pos 200 120 \
             --window-size 600 400 \
             --icon-size 128 \
-            --icon "ProteinMutationExplorer.app" 150 185 \
-            --hide-extension "ProteinMutationExplorer.app" \
+            --icon "MMexplorer.app" 150 185 \
+            --hide-extension "MMexplorer.app" \
             --app-drop-link 450 185 \
-            "dist/ProteinMutationExplorer-${VERSION}-mac.dmg" \
-            "dist/ProteinMutationExplorer.app" \
+            "dist/MMexplorer-${VERSION}-mac.dmg" \
+            "dist/MMexplorer.app" \
           || hdiutil create \
-              -volname "Protein Mutation Explorer" \
-              -srcfolder "dist/ProteinMutationExplorer.app" \
+              -volname "MMexplorer" \
+              -srcfolder "dist/MMexplorer.app" \
               -ov -format UDZO \
-              "dist/ProteinMutationExplorer-${VERSION}-mac.dmg"
+              "dist/MMexplorer-${VERSION}-mac.dmg"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: mac-dmg
-          path: dist/ProteinMutationExplorer-*-mac.dmg
+          path: dist/MMexplorer-*-mac.dmg
 
   # ── GitHub Release (waits for both builds) ────────────────────────────────
   release:
@@ -127,14 +127,14 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Protein Mutation Explorer ${{ github.ref_name }}"
+          name: "MMexplorer ${{ github.ref_name }}"
           body: |
-            ## Protein Mutation Explorer ${{ github.ref_name }}
+            ## MMexplorer ${{ github.ref_name }}
 
             | Platform | Download |
             |----------|----------|
-            | Windows  | `ProteinMutationExplorer-*-Setup.exe` |
-            | macOS    | `ProteinMutationExplorer-*-mac.dmg`  |
+            | Windows  | `MMexplorer-*-Setup.exe` |
+            | macOS    | `MMexplorer-*-mac.dmg`  |
           files: |
             artifacts/windows-installer/*
             artifacts/mac-dmg/*

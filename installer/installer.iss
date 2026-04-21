@@ -1,12 +1,12 @@
 ; Inno Setup script — Protein Missense Mutation Explorer
 ; Copyright (c) 2026 fredsanto (Federico Santoni)
 
-#define AppName      "Protein Mutation Explorer"
+#define AppName      "MMexplorer"
 #define AppVersion   "1.0.0"
 #define AppPublisher "fredsanto (Federico Santoni)"
 #define AppURL       "https://github.com/fredsanto/protein-mutation"
-#define AppExeName   "ProteinMutationExplorer.exe"
-#define BuildDir     "..\dist\ProteinMutationExplorer"
+#define AppExeName   "MMexplorer.exe"
+#define BuildDir     "..\dist\MMexplorer"
 
 [Setup]
 AppId={{8F3A2B1C-4D5E-6F7A-8B9C-0D1E2F3A4B5C}
@@ -20,7 +20,7 @@ DefaultGroupName={#AppName}
 AllowNoIcons=yes
 LicenseFile=license.txt
 OutputDir=output
-OutputBaseFilename=ProteinMutationExplorer-{#AppVersion}-Setup
+OutputBaseFilename=MMexplorer-{#AppVersion}-Setup
 SetupIconFile=icon.ico
 Compression=lzma2/ultra64
 SolidCompression=yes

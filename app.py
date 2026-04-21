@@ -1,5 +1,5 @@
 """
-Protein Missense Mutation Explorer
+MMexplorer — Protein Missense Mutation Explorer
 -----------------------------------
 1. Fetch best available PDB structure (crystal > AlphaFold)
 2. Apply the requested missense mutation with PDBFixer

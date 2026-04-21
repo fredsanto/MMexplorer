@@ -6,7 +6,7 @@
 setlocal enabledelayedexpansion
 
 echo ============================================================
-echo  Protein Mutation Explorer — Windows installer build
+echo  MMexplorer — Windows installer build
 echo ============================================================
 
 :: ---- 1. Install PyInstaller if missing ----
@@ -17,7 +17,7 @@ if errorlevel 1 (
 )
 
 :: ---- 2. Clean previous build ----
-if exist dist\ProteinMutationExplorer rmdir /s /q dist\ProteinMutationExplorer
+if exist dist\MMexplorer rmdir /s /q dist\MMexplorer
 if exist build rmdir /s /q build
 
 :: ---- 3. PyInstaller bundle ----
@@ -49,5 +49,5 @@ if errorlevel 1 (
 
 echo.
 echo ============================================================
-echo  Done! Installer: installer\output\ProteinMutationExplorer-1.0.0-Setup.exe
+echo  Done! Installer: installer\output\MMexplorer-1.0.0-Setup.exe
 echo ============================================================

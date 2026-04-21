@@ -41,7 +41,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="ProteinMutationExplorer",
+    name="MMexplorer",
     debug=False,
     strip=False,
     upx=False,          # UPX unreliable on macOS ARM
@@ -55,17 +55,17 @@ coll = COLLECT(
     a.datas,
     strip=False,
     upx=False,
-    name="ProteinMutationExplorer",
+    name="MMexplorer",
 )
 
 app = BUNDLE(
     coll,
-    name="ProteinMutationExplorer.app",
+    name="MMexplorer.app",
     icon="installer/icon.icns",
     bundle_identifier="com.fredsanto.mmexplorer",
     info_plist={
-        "CFBundleName":               "Protein Mutation Explorer",
-        "CFBundleDisplayName":        "Protein Mutation Explorer",
+        "CFBundleName":               "MMexplorer",
+        "CFBundleDisplayName":        "MMexplorer",
         "CFBundleVersion":            "1.0.0",
         "CFBundleShortVersionString": "1.0.0",
         "CFBundleIdentifier":         "com.fredsanto.mmexplorer",
