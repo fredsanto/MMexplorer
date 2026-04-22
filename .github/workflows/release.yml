@@ -38,7 +38,7 @@ jobs:
         run: choco install innosetup -y
 
       - name: Build installer
-        run: '& "C:\Program Files (x86)\Inno Setup 6\Compil32.exe" installer\installer.iss'
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\installer.iss'
 
       - name: Rename installer to tag version
         run: |
@@ -117,6 +117,8 @@ jobs:
     needs: [build-windows, build-mac]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
 
     steps:
       - name: Download all artifacts
