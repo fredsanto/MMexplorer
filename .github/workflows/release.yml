@@ -37,8 +37,18 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup -y
 
+      - name: Locate Inno Setup compiler
+        id: iscc
+        shell: pwsh
+        run: |
+          $path = Get-ChildItem -Path "C:\Program Files*","$env:LOCALAPPDATA\Programs" -Recurse -Filter "ISCC.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $path) { Write-Error "ISCC.exe not found"; exit 1 }
+          Write-Host "Found: $path"
+          "iscc_path=$path" | Out-File -Append $env:GITHUB_OUTPUT
+
       - name: Build installer
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\installer.iss'
+        shell: pwsh
+        run: '& "${{ steps.iscc.outputs.iscc_path }}" installer\installer.iss'
 
       - name: Rename installer to tag version
         run: |
