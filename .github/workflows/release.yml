@@ -50,14 +50,6 @@ jobs:
         shell: pwsh
         run: '& "${{ steps.iscc.outputs.iscc_path }}" installer\installer.iss'
 
-      - name: Rename installer to tag version
-        run: |
-          $version = "${{ github.ref_name }}".TrimStart("v")
-          Rename-Item `
-            "installer\output\MMexplorer-1.0.0-Setup.exe" `
-            "installer\output\MMexplorer-$version-Setup.exe" `
-            -ErrorAction SilentlyContinue
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
